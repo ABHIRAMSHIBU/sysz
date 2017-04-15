@@ -1,6 +1,6 @@
 #!/usr/bin/python2
 ########################################################################################################
-##Copyright (C) 2017 Abhiram Shibu                                                                    ##                    
+##Copyright (C) 2017 Abhiram Shibu                                                                    ## ##                                                                                                    ##
 ##                                                                                                    ##
 ##This program is free software; you can redistribute it and/or modify it under the terms of the GNU  ##
 ##General Public License as published by the Free Software Foundation; with version 2 of the          ##
@@ -25,12 +25,39 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 def init():
+	check=1
 	c=0
-	for i in range(100):
+	cpuinfo_file=os.popen("cat /proc/cpuinfo").read()
+	cpuinfo_file=cpuinfo_file.split("\n")
+	cpuinfo_get=['vendor_id','model name','cpu MHz','cache size']
+	tmp=[]
+	a=cpuinfo_file[0]	
+	a=a.replace("\t"," ")
+	a=a.replace(":"," ").split()
+	z=0
+	for i in cpuinfo_file:
+		if a[0] in i:
+			z+=1
+		if z==2:
+			break
+		tmp.append(i)
+	cpuinfo_file=tmp
+	dic={}
+	for i in range(30):
 		cols=int(os.popen("tput cols").read().strip())	
 		os.system('clear');
 		print bcolors.HEADER+"I am SYSz".center(cols)+bcolors.ENDC
 		print "Checking system requirements ",
+		if(i<len(cpuinfo_get)):
+			for z in cpuinfo_file:
+				if cpuinfo_get[i] in z :
+					z=z.replace(cpuinfo_get[i],' ')
+					z=z.replace("\t"," ")
+					z=z.replace(":"," ").strip()
+					key=cpuinfo_get[i]
+					dic[key]=z
+					print key + "=>" + z + " ",
+					
 		if(c==0):
 			print "-"
 			c+=1
@@ -44,5 +71,8 @@ def init():
 			print "/"
 			c=0
 		time.sleep(0.2)
-init()
+	return(cpuinfo_get,dic)
+keys,cpu=init()
+print cpu
+
 
