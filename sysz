@@ -14,6 +14,7 @@
 ##write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA  ##
 ########################################################################################################
 import time
+import subprocess
 import os
 class bcolors:
     HEADER = '\033[95m'
@@ -75,4 +76,15 @@ def init():
 keys,cpu=init()
 print cpu
 
+def read_status():
+    """
+    This function reads the output of your command, finds the line with
+    'percentage' (line 17, where first line = 0) and reads the figure
+    """
+    command = "upower -i $(upower -e | grep BAT) | grep --color=never -E percentage|xargs|cut -d' ' -f2|sed s/%//"
+    get_batterydata = subprocess.Popen(["/bin/bash", "-c", command], stdout=subprocess.PIPE)
+    return get_batterydata.communicate()[0].decode("utf-8").replace("\n", "")
+
+charge = int(read_status())
+print("Battery Charged :",charge,"%")
 
